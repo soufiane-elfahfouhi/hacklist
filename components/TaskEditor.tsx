@@ -6,9 +6,10 @@ import {
   Flag,
   Calendar as CalendarIcon,
   Clock,
-  Tag,
   ChevronDown,
   X,
+  Waves,
+  Inbox as InboxIcon,
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -39,7 +40,7 @@ export function TaskEditor({
   const [content, setContent] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<Priority>(4);
-  const [dueDate, setDueDate] = useState<string>('');
+  const [dueDate, setDueDate] = useState<string>('Today');
   const [deadline, setDeadline] = useState<string>('');
   const [recurrence, setRecurrence] = useState<string>('');
   const [isPriorityOpen, setIsPriorityOpen] = useState(false);
@@ -52,11 +53,18 @@ export function TaskEditor({
 
     try {
       setLoading(true);
+      const computedDueDate =
+        dueDate === 'Today'
+          ? '2026-10-31'
+          : dueDate === 'Tomorrow'
+          ? '2026-11-01'
+          : dueDate || null;
+
       await onSave({
         content: content.trim(),
         description: description.trim(),
         priority,
-        dueDate: dueDate || null,
+        dueDate: computedDueDate,
         deadline: deadline || null,
         recurrence: recurrence || null,
       });
@@ -77,17 +85,26 @@ export function TaskEditor({
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-3 bg-white dark:bg-[#202020] border border-gray-300 dark:border-neutral-700 rounded-xl shadow-xs transition-all text-sm mb-3"
+      className="p-3 bg-white dark:bg-[#202020] border border-[#e5e5e5] dark:border-neutral-700 rounded-[10px] shadow-xs transition-all text-sm mb-3"
     >
-      {/* Title Input */}
-      <input
-        type="text"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder={placeholder}
-        autoFocus
-        className="w-full bg-transparent font-medium text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none mb-1 text-[14px]"
-      />
+      {/* Title & Ramble wave icon */}
+      <div className="flex items-start justify-between gap-2">
+        <input
+          type="text"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder={placeholder}
+          autoFocus
+          className="w-full bg-transparent font-medium text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none mb-1 text-[14px]"
+        />
+        <button
+          type="button"
+          className="text-gray-400 hover:text-[#1F91EB] transition-colors p-1"
+          title="Voice Ramble Input"
+        >
+          <Waves className="w-4 h-4" />
+        </button>
+      </div>
 
       {/* Description Textarea */}
       <textarea
@@ -98,49 +115,91 @@ export function TaskEditor({
         className="w-full bg-transparent text-gray-600 dark:text-gray-300 placeholder-gray-400 focus:outline-none resize-none text-[13px]"
       />
 
-      {/* Pill Buttons Row: Due Date, Priority, Deadline */}
+      {/* Interactive Pill Buttons Row (Exact Todoist UI) */}
       <div className="flex flex-wrap items-center gap-1.5 mt-2">
-        {/* Due Date Pill Button */}
+        {/* Due Date Pill: [Today x] */}
         <div className="relative">
-          <button
-            type="button"
-            onClick={() => setIsDateOpen(!isDateOpen)}
-            className={clsx(
-              'flex items-center gap-1.5 px-2.5 py-1 border rounded-md text-[12px] font-medium transition-colors cursor-pointer',
-              dueDate
-                ? 'border-[#058527] text-[#058527] bg-[#058527]/10'
-                : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800'
-            )}
-          >
-            <CalendarIcon className="w-3.5 h-3.5" />
-            <span>{dueDate || 'Due date'}</span>
-          </button>
+          {dueDate ? (
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 border border-[#058527] bg-[#058527]/10 text-[#058527] rounded-md text-[12px] font-medium">
+              <CalendarIcon className="w-3.5 h-3.5" />
+              <span>{dueDate}</span>
+              <button
+                type="button"
+                onClick={() => setDueDate('')}
+                className="hover:bg-[#058527]/20 rounded-full p-0.5 cursor-pointer ml-0.5"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsDateOpen(!isDateOpen)}
+              className="inline-flex items-center gap-1.5 px-2 py-0.5 border border-gray-300 dark:border-neutral-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-md text-[12px] font-medium cursor-pointer"
+            >
+              <CalendarIcon className="w-3.5 h-3.5 text-gray-500" />
+              <span>Due date</span>
+            </button>
+          )}
 
           {isDateOpen && (
-            <div className="absolute left-0 top-full mt-1 z-30 p-2 bg-white dark:bg-[#282828] border border-gray-200 dark:border-neutral-700 rounded-lg shadow-lg space-y-2">
-              <input
-                type="date"
-                value={dueDate}
-                onChange={(e) => {
-                  setDueDate(e.target.value);
+            <div className="absolute left-0 top-full mt-1 z-30 p-2 bg-white dark:bg-[#282828] border border-gray-200 dark:border-neutral-700 rounded-lg shadow-lg space-y-1 w-40 text-xs">
+              <button
+                type="button"
+                onClick={() => {
+                  setDueDate('Today');
                   setIsDateOpen(false);
                 }}
-                className="text-xs bg-gray-50 dark:bg-neutral-800 p-1.5 border border-gray-200 dark:border-neutral-700 rounded-md focus:outline-none"
-              />
+                className="w-full text-left px-2 py-1 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded cursor-pointer"
+              >
+                Today
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDueDate('Tomorrow');
+                  setIsDateOpen(false);
+                }}
+                className="w-full text-left px-2 py-1 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded cursor-pointer"
+              >
+                Tomorrow
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDueDate('Next week');
+                  setIsDateOpen(false);
+                }}
+                className="w-full text-left px-2 py-1 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded cursor-pointer"
+              >
+                Next week
+              </button>
             </div>
           )}
         </div>
 
-        {/* Priority Flag Pill Button */}
+        {/* Deadline Pill */}
+        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 border border-gray-300 dark:border-neutral-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-md text-[12px] font-medium cursor-pointer">
+          <Clock className="w-3.5 h-3.5 text-gray-400" />
+          <input
+            type="date"
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+            className="bg-transparent focus:outline-none cursor-pointer text-[11px]"
+            title="Deadline"
+          />
+        </div>
+
+        {/* Priority Flag Pill */}
         <div className="relative">
           <button
             type="button"
             onClick={() => setIsPriorityOpen(!isPriorityOpen)}
             className={clsx(
-              'flex items-center gap-1.5 px-2.5 py-1 border rounded-md text-[12px] font-medium transition-colors cursor-pointer',
+              'inline-flex items-center gap-1.5 px-2 py-0.5 border rounded-md text-[12px] font-medium cursor-pointer',
               priority !== 4
                 ? 'border-gray-300 ' + priorityMeta[priority].color
-                : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800'
+                : 'border-gray-300 dark:border-neutral-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800'
             )}
           >
             <Flag className={clsx('w-3.5 h-3.5', priorityMeta[priority].color)} fill="currentColor" />
@@ -167,36 +226,47 @@ export function TaskEditor({
           )}
         </div>
 
-        {/* Hard Deadline Input Pill */}
-        <div className="flex items-center gap-1 px-2.5 py-1 border border-gray-200 dark:border-neutral-700 rounded-md text-[12px] text-gray-600 dark:text-gray-300">
-          <Clock className="w-3.5 h-3.5 text-rose-500" />
-          <input
-            type="date"
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-            placeholder="Deadline"
-            className="bg-transparent focus:outline-none cursor-pointer text-[11px]"
-            title="Hard deadline"
-          />
+        {/* Reminders Pill */}
+        <div className="inline-flex items-center gap-1 px-2 py-0.5 border border-gray-300 dark:border-neutral-700 text-gray-500 rounded-md text-[12px] font-medium">
+          <Clock className="w-3.5 h-3.5" />
+          <span>Reminders</span>
+        </div>
+
+        {/* More Actions Pill (...) */}
+        <div className="inline-flex items-center px-1.5 py-0.5 border border-gray-300 dark:border-neutral-700 text-gray-400 rounded-md text-[12px] font-medium">
+          <span>•••</span>
         </div>
       </div>
 
-      {/* Bottom Row: Cancel and Add Task buttons */}
-      <div className="flex items-center justify-end gap-2 mt-3 pt-2.5 border-t border-gray-100 dark:border-neutral-800">
+      {/* Footer Row: Project Selector (Left) & Cancel/Add task (Right) */}
+      <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-[#f0f0f0] dark:border-neutral-800">
+        {/* Project Selector pill */}
         <button
           type="button"
-          onClick={onCancel}
-          className="px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-md transition-colors cursor-pointer"
+          className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-neutral-800 py-1 px-2 rounded-md transition-colors cursor-pointer"
         >
-          Cancel
+          <InboxIcon className="w-3.5 h-3.5 text-gray-400" />
+          <span>Inbox</span>
+          <ChevronDown className="w-3 h-3 text-gray-400" />
         </button>
-        <button
-          type="submit"
-          disabled={!content.trim() || loading}
-          className="px-3.5 py-1.5 text-xs font-semibold text-white bg-[#1F91EB] hover:bg-[#5BADEE] disabled:opacity-50 disabled:cursor-not-allowed rounded-md transition-colors shadow-xs cursor-pointer"
-        >
-          {loading ? 'Adding...' : 'Add task'}
-        </button>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-md transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={!content.trim() || loading}
+            className="px-3.5 py-1.5 text-xs font-semibold text-white bg-[#1F91EB] hover:bg-[#5BADEE] disabled:opacity-50 disabled:cursor-not-allowed rounded-md transition-colors shadow-xs cursor-pointer"
+          >
+            {loading ? 'Adding...' : 'Add task'}
+          </button>
+        </div>
       </div>
     </form>
   );

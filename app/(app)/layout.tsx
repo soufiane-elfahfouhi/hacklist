@@ -2,11 +2,10 @@
 
 import React, { useState, Suspense } from 'react';
 import { AppProvider, useApp } from '@/context/AppContext';
-import { TopHeader } from '@/components/TopHeader';
 import { Sidebar } from '@/components/Sidebar';
 import { TaskModal } from '@/components/TaskModal';
 import { TaskEditor } from '@/components/TaskEditor';
-import { X } from 'lucide-react';
+import { PanelLeft, X } from 'lucide-react';
 
 function AppLayoutInner({ children }: { children: React.ReactNode }) {
   const {
@@ -40,33 +39,35 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
   const projectColors = ['#1F91EB', '#5BADEE', '#246fe0', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-white dark:bg-[#1f1f1f]">
-      {/* 1. Iconic Todoist Top Navigation Bar (Height: 44px) */}
-      <TopHeader
-        onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-        onOpenQuickAdd={() => setIsQuickAddOpen(true)}
-      />
+    <div className="flex h-screen w-screen overflow-hidden bg-white dark:bg-[#1a1a1a]">
+      {/* Collapsible Sidebar (280px, exact Todoist Web design) */}
+      {isSidebarOpen ? (
+        <Suspense fallback={<div className="w-[280px] h-full bg-[#fcfaf8] dark:bg-[#1a1a1a]" />}>
+          <Sidebar
+            projects={projects}
+            counts={counts}
+            profile={profile}
+            onOpenQuickAdd={() => setIsQuickAddOpen(true)}
+            onOpenAddProject={() => setIsAddProjectOpen(true)}
+            onToggleCollapse={() => setIsSidebarOpen(false)}
+          />
+        </Suspense>
+      ) : (
+        <div className="p-3">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-1.5 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-black/5 dark:hover:bg-white/5 rounded-md cursor-pointer transition-colors"
+            title="Expand sidebar"
+          >
+            <PanelLeft className="w-5 h-5" />
+          </button>
+        </div>
+      )}
 
-      {/* 2. Main Workspace Layout */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Collapsible 280px Left Sidebar */}
-        {isSidebarOpen && (
-          <Suspense fallback={<div className="w-[280px] h-full bg-[#fafafa] dark:bg-[#1f1f1f]" />}>
-            <Sidebar
-              projects={projects}
-              counts={counts}
-              profile={profile}
-              onOpenQuickAdd={() => setIsQuickAddOpen(true)}
-              onOpenAddProject={() => setIsAddProjectOpen(true)}
-            />
-          </Suspense>
-        )}
-
-        {/* Content Area */}
-        <main className="flex-1 h-full overflow-y-auto bg-white dark:bg-[#1f1f1f]">
-          {children}
-        </main>
-      </div>
+      {/* Main Content Area */}
+      <main className="flex-1 h-full overflow-y-auto bg-white dark:bg-[#1f1f1f]">
+        {children}
+      </main>
 
       {/* Task Detail Modal (864px split view) */}
       <TaskModal
@@ -86,7 +87,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
         onCompleteTask={completeTask}
       />
 
-      {/* Global Quick Add Modal (opened via Top Bar '+' or shortcut) */}
+      {/* Global Quick Add Modal */}
       {isQuickAddOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
           <div className="w-full max-w-lg bg-white dark:bg-[#202020] rounded-2xl shadow-2xl border border-gray-200 dark:border-neutral-800 p-4 animate-in fade-in zoom-in-95 duration-100">
