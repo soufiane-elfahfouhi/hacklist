@@ -2,15 +2,15 @@
 
 import React, { useState, Suspense } from 'react';
 import { AppProvider, useApp } from '@/context/AppContext';
+import { TopHeader } from '@/components/TopHeader';
 import { Sidebar } from '@/components/Sidebar';
 import { TaskModal } from '@/components/TaskModal';
 import { TaskEditor } from '@/components/TaskEditor';
-import { Plus, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 function AppLayoutInner({ children }: { children: React.ReactNode }) {
   const {
     projects,
-    tasks,
     counts,
     profile,
     selectedTask,
@@ -24,6 +24,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
     createProject,
   } = useApp();
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isAddProjectOpen, setIsAddProjectOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectColor, setNewProjectColor] = useState('#1F91EB');
@@ -39,24 +40,35 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
   const projectColors = ['#1F91EB', '#5BADEE', '#246fe0', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-white dark:bg-[#1a1a1a]">
-      {/* 280px Left Sidebar */}
-      <Suspense fallback={<div className="w-[280px] h-screen bg-[#fafafa] dark:bg-[#1a1a1a]" />}>
-        <Sidebar
-          projects={projects}
-          counts={counts}
-          profile={profile}
-          onOpenQuickAdd={() => setIsQuickAddOpen(true)}
-          onOpenAddProject={() => setIsAddProjectOpen(true)}
-        />
-      </Suspense>
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-white dark:bg-[#1f1f1f]">
+      {/* 1. Iconic Todoist Top Navigation Bar (Height: 44px) */}
+      <TopHeader
+        onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+        onOpenQuickAdd={() => setIsQuickAddOpen(true)}
+      />
 
-      {/* Main Content Area */}
-      <main className="flex-1 h-screen overflow-y-auto bg-white dark:bg-[#1f1f1f]">
-        {children}
-      </main>
+      {/* 2. Main Workspace Layout */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Collapsible 280px Left Sidebar */}
+        {isSidebarOpen && (
+          <Suspense fallback={<div className="w-[280px] h-full bg-[#fafafa] dark:bg-[#1f1f1f]" />}>
+            <Sidebar
+              projects={projects}
+              counts={counts}
+              profile={profile}
+              onOpenQuickAdd={() => setIsQuickAddOpen(true)}
+              onOpenAddProject={() => setIsAddProjectOpen(true)}
+            />
+          </Suspense>
+        )}
 
-      {/* Task Detail Modal (864px) */}
+        {/* Content Area */}
+        <main className="flex-1 h-full overflow-y-auto bg-white dark:bg-[#1f1f1f]">
+          {children}
+        </main>
+      </div>
+
+      {/* Task Detail Modal (864px split view) */}
       <TaskModal
         task={selectedTask}
         projects={projects}
@@ -74,10 +86,10 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
         onCompleteTask={completeTask}
       />
 
-      {/* Quick Add Modal */}
+      {/* Global Quick Add Modal (opened via Top Bar '+' or shortcut) */}
       {isQuickAddOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-lg bg-white dark:bg-[#242424] rounded-2xl shadow-2xl border border-gray-200 dark:border-neutral-800 p-4">
+          <div className="w-full max-w-lg bg-white dark:bg-[#202020] rounded-2xl shadow-2xl border border-gray-200 dark:border-neutral-800 p-4 animate-in fade-in zoom-in-95 duration-100">
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-gray-100 dark:border-neutral-800">
               <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Quick Add Task</span>
               <button
@@ -102,7 +114,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Add Project Modal */}
       {isAddProjectOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm bg-white dark:bg-[#242424] rounded-2xl shadow-2xl border border-gray-200 dark:border-neutral-800 p-5">
+          <div className="w-full max-w-sm bg-white dark:bg-[#202020] rounded-2xl shadow-2xl border border-gray-200 dark:border-neutral-800 p-5">
             <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">Add Project</h3>
             <form onSubmit={handleAddProjectSubmit} className="space-y-4">
               <div>

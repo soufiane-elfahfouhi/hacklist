@@ -1,20 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Project, Profile } from '@/lib/types';
 import {
-  Inbox,
-  Calendar,
-  CalendarDays,
-  Plus,
-  BarChart2,
-  History,
-  Settings,
   ChevronDown,
-  Hash,
-  Sparkles,
+  ChevronRight,
+  Plus,
+  MoreHorizontal,
+  BarChart2,
+  Settings,
+  CalendarDays,
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -38,72 +35,117 @@ export function Sidebar({
   onOpenAddProject,
 }: SidebarProps) {
   const pathname = usePathname();
+  const [projectsExpanded, setProjectsExpanded] = useState(true);
+
+  const todayDateNum = new Date().getDate();
 
   const navItems = [
-    { label: 'Inbox', href: '/inbox', icon: Inbox, count: counts.inbox, color: 'text-[#1F91EB]' },
-    { label: 'Today', href: '/today', icon: Calendar, count: counts.today, color: 'text-emerald-500' },
-    { label: 'Upcoming', href: '/upcoming', icon: CalendarDays, count: counts.upcoming, color: 'text-purple-500' },
-    { label: 'Calendar', href: '/calendar', icon: CalendarDays, color: 'text-indigo-500' },
-  ];
-
-  const secondaryNav = [
-    { label: 'Productivity & Karma', href: '/stats', icon: BarChart2 },
-    { label: 'Activity History', href: '/activity', icon: History },
-    { label: 'Antigravity / API', href: '/settings/integrations', icon: Settings },
+    {
+      id: 'inbox',
+      label: 'Inbox',
+      href: '/inbox',
+      count: counts.inbox,
+      icon: (
+        <svg className="w-5 h-5 text-[#246fe0]" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5v-3h3.56c.69 1.19 1.97 2 3.44 2s2.75-.81 3.44-2H19v3zm0-5h-4.99c0 1.1-.9 2-2.01 2s-2.01-.9-2.01-2H5V5h14v9z" />
+        </svg>
+      ),
+    },
+    {
+      id: 'today',
+      label: 'Today',
+      href: '/today',
+      count: counts.today,
+      icon: (
+        <div className="relative w-5 h-5 flex items-center justify-center text-[#058527]">
+          {/* Calendar icon with date number inside */}
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="4" width="18" height="18" rx="3" ry="3" />
+            <line x1="16" y1="2" x2="16" y2="6" strokeLinecap="round" />
+            <line x1="8" y1="2" x2="8" y2="6" strokeLinecap="round" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          <span className="absolute bottom-[2px] text-[9px] font-bold text-[#058527] leading-none">
+            {todayDateNum}
+          </span>
+        </div>
+      ),
+    },
+    {
+      id: 'upcoming',
+      label: 'Upcoming',
+      href: '/upcoming',
+      count: counts.upcoming,
+      icon: (
+        <svg className="w-5 h-5 text-[#692fc2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="4" width="18" height="18" rx="3" ry="3" />
+          <line x1="16" y1="2" x2="16" y2="6" strokeLinecap="round" />
+          <line x1="8" y1="2" x2="8" y2="6" strokeLinecap="round" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+          <circle cx="8" cy="15" r="1.2" fill="currentColor" />
+          <circle cx="12" cy="15" r="1.2" fill="currentColor" />
+          <circle cx="16" cy="15" r="1.2" fill="currentColor" />
+        </svg>
+      ),
+    },
+    {
+      id: 'calendar',
+      label: 'Calendar',
+      href: '/calendar',
+      icon: (
+        <CalendarDays className="w-5 h-5 text-[#1F91EB]" />
+      ),
+    },
   ];
 
   return (
-    <aside className="w-[280px] h-screen bg-[#fafafa] dark:bg-[#1a1a1a] border-r border-[#e5e7eb] dark:border-[#2d2d2d] flex flex-col justify-between select-none">
-      <div className="flex-1 overflow-y-auto p-3">
-        {/* User Profile Header */}
-        <div className="flex items-center justify-between px-2 py-1.5 mb-3 rounded-lg hover:bg-gray-200/50 dark:hover:bg-neutral-800 transition-all cursor-pointer">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-7 h-7 rounded-full bg-[#1F91EB] text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs">
+    <aside className="w-[280px] h-full bg-[#fafafa] dark:bg-[#1f1f1f] border-r border-[#ececec] dark:border-[#2b2b2b] flex flex-col justify-between select-none">
+      <div className="flex-1 overflow-y-auto px-2 py-3">
+        {/* Workspace / User Selector Row */}
+        <div className="flex items-center justify-between px-2 py-1.5 mb-2 rounded-md hover:bg-[#eee] dark:hover:bg-[#2c2c2c] transition-colors cursor-pointer group">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-6 h-6 rounded-full bg-[#1F91EB] text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs">
               {profile?.full_name ? profile.full_name[0] : 'H'}
             </div>
-            <div className="min-w-0">
-              <span className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 truncate block">
-                {profile?.full_name || 'Hacklist Workspace'}
-              </span>
-              <span className="text-[10px] text-gray-500 flex items-center gap-1 font-medium">
-                <Sparkles className="w-2.5 h-2.5 text-[#1F91EB]" />
-                Karma: {profile?.karma || 0}
-              </span>
-            </div>
+            <span className="text-[14px] font-semibold text-gray-800 dark:text-gray-200 truncate">
+              {profile?.full_name || 'My Workspace'}
+            </span>
           </div>
+          <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
         </div>
 
-        {/* Quick Add Task Button */}
+        {/* Add Task Button (Todoist standard inline style) */}
         <button
           onClick={onOpenQuickAdd}
-          className="w-full flex items-center gap-2.5 px-3 py-2 mb-3 bg-[#1F91EB] hover:bg-[#5BADEE] text-white rounded-lg text-[13px] font-medium shadow-xs transition-all cursor-pointer"
+          className="w-full flex items-center gap-2.5 px-2 py-1.5 mb-3 rounded-md text-[14px] font-medium text-gray-700 dark:text-gray-300 hover:bg-[#eee] dark:hover:bg-[#2c2c2c] transition-colors cursor-pointer group"
         >
-          <Plus className="w-4 h-4 stroke-[2.5]" />
-          <span>Add task</span>
+          <div className="w-5 h-5 rounded-full bg-[#1F91EB] text-white flex items-center justify-center group-hover:scale-105 transition-transform">
+            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+          </div>
+          <span className="font-semibold text-[#1F91EB]">Add task</span>
         </button>
 
-        {/* Primary Views Nav */}
-        <nav className="space-y-0.5 mb-5">
+        {/* Core Navigation List */}
+        <nav className="space-y-0.5 mb-6">
           {navItems.map((item) => {
-            const Icon = item.icon;
             const active = pathname === item.href;
             return (
               <Link
-                key={item.href}
+                key={item.id}
                 href={item.href}
                 className={clsx(
-                  'flex items-center justify-between px-2.5 py-1.5 rounded-md text-[13px] font-medium transition-all',
+                  'flex items-center justify-between px-2 py-1.5 rounded-md text-[14px] font-normal transition-colors group',
                   active
-                    ? 'bg-[#D6E7F4] text-[#1F91EB] dark:bg-[#1F91EB]/20 dark:text-[#99CAF1]'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200/60 dark:hover:bg-neutral-800'
+                    ? 'bg-[#e0effa] dark:bg-[#1F91EB]/20 text-[#1F91EB] dark:text-[#99CAF1] font-semibold'
+                    : 'text-gray-800 dark:text-gray-200 hover:bg-[#eee] dark:hover:bg-[#2c2c2c]'
                 )}
               >
-                <div className="flex items-center gap-2.5">
-                  <Icon className={clsx('w-4 h-4', item.color)} />
-                  <span>{item.label}</span>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex-shrink-0">{item.icon}</div>
+                  <span className="truncate">{item.label}</span>
                 </div>
                 {item.count !== undefined && item.count > 0 && (
-                  <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400">
+                  <span className="text-[12px] text-gray-500 dark:text-gray-400 font-mono">
                     {item.count}
                   </span>
                 )}
@@ -112,71 +154,96 @@ export function Sidebar({
           })}
         </nav>
 
-        {/* Projects Section */}
+        {/* Projects Section (Collapsible Header with Hover Actions) */}
         <div className="mb-4">
-          <div className="flex items-center justify-between px-2.5 py-1 text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            <span>My Projects</span>
+          <div className="flex items-center justify-between px-2 py-1 text-[13px] font-bold text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors group cursor-pointer">
             <button
-              onClick={onOpenAddProject}
-              className="p-0.5 hover:bg-gray-200 dark:hover:bg-neutral-700 rounded transition-all cursor-pointer"
+              onClick={() => setProjectsExpanded(!projectsExpanded)}
+              className="flex items-center gap-1.5 flex-1 text-left font-bold"
+            >
+              {projectsExpanded ? (
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              )}
+              <span>My Projects</span>
+            </button>
+
+            {/* Hover + button to add project */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenAddProject();
+              }}
+              className="p-1 hover:bg-gray-200 dark:hover:bg-neutral-700 rounded transition-opacity opacity-0 group-hover:opacity-100 cursor-pointer"
               title="Add project"
             >
-              <Plus className="w-3.5 h-3.5 text-gray-500" />
+              <Plus className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
             </button>
           </div>
 
-          <div className="space-y-0.5 mt-1">
-            {projects
-              .filter((p) => !p.is_inbox)
-              .map((project) => {
-                const href = `/project/${project.id}`;
-                const active = pathname === href;
-                return (
-                  <Link
-                    key={project.id}
-                    href={href}
-                    className={clsx(
-                      'flex items-center justify-between px-2.5 py-1.5 rounded-md text-[13px] font-medium transition-all group',
-                      active
-                        ? 'bg-[#D6E7F4] text-[#1F91EB] dark:bg-[#1F91EB]/20 dark:text-[#99CAF1]'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200/60 dark:hover:bg-neutral-800'
-                    )}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: project.color || '#1F91EB' }}
-                      />
-                      <span className="truncate">{project.name}</span>
-                    </div>
-                  </Link>
-                );
-              })}
-          </div>
+          {/* Projects List */}
+          {projectsExpanded && (
+            <div className="space-y-0.5 mt-1">
+              {projects
+                .filter((p) => !p.is_inbox)
+                .map((project) => {
+                  const href = `/project/${project.id}`;
+                  const active = pathname === href;
+                  return (
+                    <Link
+                      key={project.id}
+                      href={href}
+                      className={clsx(
+                        'flex items-center justify-between px-2.5 py-1.5 rounded-md text-[14px] transition-colors group',
+                        active
+                          ? 'bg-[#e0effa] dark:bg-[#1F91EB]/20 text-[#1F91EB] dark:text-[#99CAF1] font-semibold'
+                          : 'text-gray-800 dark:text-gray-200 hover:bg-[#eee] dark:hover:bg-[#2c2c2c]'
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        {/* 8px Colored Project Circle Dot */}
+                        <span
+                          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: project.color || '#1F91EB' }}
+                        />
+                        <span className="truncate">{project.name}</span>
+                      </div>
+
+                      {/* Options icon on hover */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-gray-300/60 dark:hover:bg-neutral-600 rounded transition-opacity cursor-pointer"
+                      >
+                        <MoreHorizontal className="w-3.5 h-3.5 text-gray-500" />
+                      </button>
+                    </Link>
+                  );
+                })}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Footer Nav */}
-      <div className="p-3 border-t border-[#e5e7eb] dark:border-[#2d2d2d] space-y-0.5">
-        {secondaryNav.map((item) => {
-          const Icon = item.icon;
-          const active = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={clsx(
-                'flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[12px] font-medium transition-all',
-                active
-                  ? 'bg-gray-200 dark:bg-neutral-800 text-gray-900 dark:text-white font-semibold'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200/60 dark:hover:bg-neutral-800'
-              )}
-            >
-              <Icon className="w-4 h-4 text-gray-400" />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
+      {/* Footer Area: Stats & Settings */}
+      <div className="p-2 border-t border-[#ececec] dark:border-[#2b2b2b] space-y-0.5">
+        <Link
+          href="/stats"
+          className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[13px] text-gray-600 dark:text-gray-400 hover:bg-[#eee] dark:hover:bg-[#2c2c2c] transition-colors"
+        >
+          <BarChart2 className="w-4 h-4 text-gray-500" />
+          <span>Productivity & Karma</span>
+        </Link>
+        <Link
+          href="/settings/integrations"
+          className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[13px] text-gray-600 dark:text-gray-400 hover:bg-[#eee] dark:hover:bg-[#2c2c2c] transition-colors"
+        >
+          <Settings className="w-4 h-4 text-gray-500" />
+          <span>Antigravity MCP Settings</span>
+        </Link>
       </div>
     </aside>
   );
