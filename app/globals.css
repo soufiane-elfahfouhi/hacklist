@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+:root {
+  /* Hacklist Custom Electric/Sky Blue Brand Palette */
+  --hl-primary: #1F91EB;
+  --hl-primary-hover: #5BADEE;
+  --hl-primary-subtle: #99CAF1;
+  --hl-primary-tint: #D6E7F4;
+  --hl-primary-tint-hover: #EBF4FB;
+
+  /* Priority Colors (Todoist Standard) */
+  --hl-p1: #d1453b; /* Red */
+  --hl-p2: #eb8909; /* Orange */
+  --hl-p3: #246fe0; /* Blue */
+  --hl-p4: #808080; /* Grey / Default */
+
+  /* Neutral surfaces */
+  --hl-canvas: #ffffff;
+  --hl-sidebar: #fafafa;
+  --hl-sidebar-hover: #f0f0f0;
+  --hl-card: #ffffff;
+  --hl-card-hover: #f8fafc;
+  --hl-border: #e5e7eb;
+  --hl-border-subtle: #f3f4f6;
+
+  /* Text */
+  --hl-text-primary: #111827;
+  --hl-text-secondary: #4b5563;
+  --hl-text-muted: #9ca3af;
+}
+
+[data-theme="dark"] {
+  --hl-canvas: #1f1f1f;
+  --hl-sidebar: #262626;
+  --hl-sidebar-hover: #303030;
+  --hl-card: #262626;
+  --hl-card-hover: #333333;
+  --hl-border: #3b3b3b;
+  --hl-border-subtle: #2d2d2d;
+
+  --hl-text-primary: #f9fafb;
+  --hl-text-secondary: #9ca3af;
+  --hl-text-muted: #6b7280;
+
+  --hl-p1: #ff7066;
+  --hl-p2: #ff9a13;
+  --hl-p3: #5297ff;
+  --hl-p4: #a9a9a9;
+}
+
+body {
+  background: var(--hl-canvas);
+  color: var(--hl-text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
