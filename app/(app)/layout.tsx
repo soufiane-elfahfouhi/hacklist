@@ -5,6 +5,7 @@ import { AppProvider, useApp } from '@/context/AppContext';
 import { Sidebar } from '@/components/Sidebar';
 import { TaskModal } from '@/components/TaskModal';
 import { TaskEditor } from '@/components/TaskEditor';
+import { SettingsModal } from '@/components/SettingsModal';
 import { PanelLeft, X } from 'lucide-react';
 
 function AppLayoutInner({ children }: { children: React.ReactNode }) {
@@ -25,6 +26,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isAddProjectOpen, setIsAddProjectOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectColor, setNewProjectColor] = useState('#1F91EB');
 
@@ -49,6 +51,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
             profile={profile}
             onOpenQuickAdd={() => setIsQuickAddOpen(true)}
             onOpenAddProject={() => setIsAddProjectOpen(true)}
+            onOpenSettings={() => setIsSettingsOpen(true)}
             onToggleCollapse={() => setIsSidebarOpen(false)}
           />
         </Suspense>
@@ -68,6 +71,14 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
       <main className="flex-1 h-full overflow-y-auto bg-white dark:bg-[#1f1f1f]">
         {children}
       </main>
+
+      {/* Settings Modal (Matching Mobbin Calendars/Settings) */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        userEmail={profile?.email || 'soufiane.elfahfouhi@gmail.com'}
+        userName={profile?.full_name || 'Samlee'}
+      />
 
       {/* Task Detail Modal (864px split view) */}
       <TaskModal

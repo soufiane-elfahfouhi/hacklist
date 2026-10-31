@@ -32,6 +32,7 @@ interface SidebarProps {
   profile?: Profile | null;
   onOpenQuickAdd: () => void;
   onOpenAddProject: () => void;
+  onOpenSettings?: () => void;
   onToggleCollapse?: () => void;
 }
 
@@ -41,6 +42,7 @@ export function Sidebar({
   profile,
   onOpenQuickAdd,
   onOpenAddProject,
+  onOpenSettings,
   onToggleCollapse,
 }: SidebarProps) {
   const pathname = usePathname();
@@ -108,7 +110,10 @@ export function Sidebar({
         {/* Top Header Row: User Profile & Actions (Exact Todoist Web Header) */}
         <div className="flex items-center justify-between mb-3 px-1">
           {/* User profile dropdown button */}
-          <button className="flex items-center gap-1.5 py-1 px-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer text-left">
+          <button
+            onClick={onOpenSettings}
+            className="flex items-center gap-1.5 py-1 px-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer text-left"
+          >
             <div className="w-6 h-6 rounded-full bg-[#1F91EB] text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs">
               {profile?.full_name ? profile.full_name[0] : 'H'}
             </div>
